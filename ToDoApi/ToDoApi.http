@@ -1,0 +1,28 @@
+@ToDoApi_HostAddress = http://localhost:5020
+
+### Obtener todas las tareas
+GET {{ToDoApi_HostAddress}}/api/Tareas
+Accept: application/json
+
+### Crear una nueva tarea
+POST {{ToDoApi_HostAddress}}/api/Tareas
+Content-Type: application/json
+
+{
+  "titulo": "Aprender ASP.NET Core",
+  "descripcion": "Estudiar para el TP 1",
+  "estaCompletada": false
+}
+
+### Actualizar una tarea (PUT) - ID 1
+PUT {{ToDoApi_HostAddress}}/api/Tareas/1
+Content-Type: application/json
+
+{
+  "titulo": "Terminar el TP de Programación Aplicada",
+  "descripcion": "Ya casi lo tenemos listo",
+  "estaCompletada": false
+}
+
+### Borrar una tarea (DELETE) - ID 2
+DELETE {{ToDoApi_HostAddress}}/api/Tareas/5
