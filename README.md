@@ -37,8 +37,11 @@ La aplicación consiste en una **API REST** para la gestión de una lista de tar
 Puedes probar los servicios utilizando el archivo ToDoApi.http incluido en la raíz del proyecto.
 
 Acción: Listar tareas | Método: GET | Endpoint: /api/Tareas
+
 Acción: Crear tarea | Método: POST | Endpoint: /api/Tareas
+
 Acción: Actualizar tarea | Método: PUT | Endpoint: /api/Tareas/{id}
+
 Acción: Eliminar tarea | Método: DELETE | Endpoint: /api/Tareas/{id}
 
 Haz clic en el enlace "Enviar solicitud" que aparece sobre cada bloque de código en el archivo .http para ver la respuesta del servidor en tiempo real.
@@ -54,6 +57,8 @@ Este código es el componente práctico de la monografía "Profundizando el ecos
 ---
 
 ## 👨‍💻 Autores
-* [Tu Nombre]
-* [Nombre de tu compañero/a]
-* [Nombre de tu compañero/a]
+* [Adrián Emanuel Sánchez Tejeda]
+* [Leandro Brangi]
+* [Facundo Martin Rodriguez]
+* [Sergio Velez Hernandez]
+* [Fernando Raul Caceres]
