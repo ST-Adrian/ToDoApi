@@ -158,13 +158,13 @@ export default function TodoApp() {
 
             <nav className="fixed top-0 w-full p-4 flex justify-end gap-6 items-center z-50 pointer-events-none">
                 <div className="flex gap-6 pointer-events-auto bg-[#0f172a]/80 p-2 rounded-xl backdrop-blur-sm">
-                    <a href="https://github.com/tu-usuario" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-yellow-400 transition-colors">
+                    <a href="https://github.com/ST-Adrian/ToDoApi" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-yellow-400 transition-colors">
                         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
                         </svg>
                         <span className="font-bold hidden sm:inline">Repo</span>
                     </a>
-                    <a href="https://docs.google.com/document/d/..." target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-yellow-400 transition-colors">
+                    <a href="https://docs.google.com/document/d/1tnyzw0MtGT_q8M9UglgAQl6xl3dK-X83hYjBHbDvbGk/edit?usp=sharing" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-yellow-400 transition-colors">
                         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                             <polyline points="14 2 14 8 20 8"></polyline>
