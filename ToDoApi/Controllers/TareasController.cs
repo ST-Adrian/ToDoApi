@@ -1,94 +1,106 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using ToDoApi.Models; // Importamos la carpeta donde vive nuestra clase Tarea
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ToDoApi.Models;
 
 namespace ToDoApi.Controllers
 {
-    // -----------------------------------------------------------------------------
-    // [Route] define la URL base para todas las peticiones de este archivo.
-    // El "[controller]" es un comodín inteligente de ASP.NET Core. 
-    // Como nuestra clase se llama "TareasController", asume que la URL será: /api/Tareas
-    // -----------------------------------------------------------------------------
     [Route("api/[controller]")]
-
-    // [ApiController] activa validaciones automáticas. Por ejemplo, si el cliente 
-    // manda un JSON mal formado, este atributo devuelve un error 400 (Bad Request) 
-    // automáticamente sin que tengamos que escribir código para comprobarlo.
     [ApiController]
     public class TareasController : ControllerBase
     {
-        // Para mantener esta primera demo súper sencilla y enfocarnos en aprender REST 
-        // (sin necesidad de configurar motores de bases de datos complejos hoy), 
-        // usaremos una lista estática en memoria. 
-        // Es el equivalente exacto a declarar un arreglo en el scope global del servidor.
-        private static List<Tarea> _tareas = new List<Tarea>
-        {
-            new Tarea { Id = 1, Titulo = "Hacer el TP de Programación Aplicada", EstaCompletada = false },
-            new Tarea { Id = 2, Titulo = "Instalar Visual Studio", EstaCompletada = true },
-            new Tarea { Id = 3, Titulo = "Que el profe nos ponga 10", EstaCompletada = false }
-        };
+        private readonly TareasContext _context;
 
-        // =========================================================================
-        // 1. ENDPOINT: OBTENER TODAS LAS TAREAS (READ)
-        // =========================================================================
-        [HttpGet] // Esta etiqueta le dice al servidor: "Responde solo a peticiones GET"
-        public ActionResult<IEnumerable<Tarea>> ObtenerTareas()
+        public TareasController(TareasContext context)
         {
-            // El método Ok() genera una respuesta HTTP con código de estado 200 (Éxito).
-            // Además, toma nuestra lista de objetos en C# y la serializa (convierte) 
-            // mágicamente a formato JSON para enviarla al cliente.
-            return Ok(_tareas);
+            _context = context;
         }
 
-        // =========================================================================
-        // 2. ENDPOINT: CREAR UNA NUEVA TAREA (CREATE)
-        // =========================================================================
-        [HttpPost] // Responde a peticiones POST (cuando el cliente envía datos)
-        public ActionResult<Tarea> CrearTarea([FromBody] Tarea nuevaTarea)
+        // GET: api/Tareas?usuarioId=anon-123
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Tarea>>> ObtenerTareas([FromQuery] string usuarioId)
         {
-            // Simulamos la creación de un ID autoincremental como haría una base de datos real.
-            // Buscamos el ID más alto y le sumamos 1.
-            nuevaTarea.Id = _tareas.Count > 0 ? _tareas.Max(t => t.Id) + 1 : 1;
+            if (string.IsNullOrEmpty(usuarioId)) return BadRequest("El usuarioId es requerido.");
 
-            // Agregamos la tarea recibida a nuestra "base de datos" temporal.
-            _tareas.Add(nuevaTarea);
-
-            // La buena práctica en la arquitectura REST dice que cuando creas algo,
-            // debes devolver un código 201 (Created), junto con el objeto recién creado.
-            return CreatedAtAction(nameof(ObtenerTareas), new { id = nuevaTarea.Id }, nuevaTarea);
+            // Filtramos en la base de datos antes de traer la lista
+            return await _context.Tareas.Where(t => t.UsuarioId == usuarioId).ToListAsync();
         }
-        // =========================================================================
-        // 3. ENDPOINT: ACTUALIZAR UNA TAREA (UPDATE)
-        // =========================================================================
-        [HttpPut("{id}")] // Indicamos que esta ruta espera un ID en la URL (ej: /api/Tareas/1)
-        public ActionResult ActualizarTarea(int id, Tarea tareaActualizada)
+
+        // POST: api/Tareas
+        [HttpPost]
+        public async Task<ActionResult<Tarea>> CrearTarea([FromBody] Tarea nuevaTarea)
         {
-            // Buscamos si la tarea existe en nuestra lista
-            var tarea = _tareas.FirstOrDefault(t => t.Id == id);
+            var palabrasProhibidas = new List<string> { "tonto", "feo", "hack", "drop table" };
 
-            if (tarea == null) return NotFound(); // Si no existe, devolvemos error 404
+            bool contienePalabraIndebida = palabrasProhibidas.Any(palabra =>
+                nuevaTarea.Titulo.ToLower().Contains(palabra));
 
-            // Si existe, actualizamos sus campos
+            if (contienePalabraIndebida)
+            {
+                return BadRequest(new { mensaje = "Por favor, mantengamos un lenguaje profesional en la demo." });
+            }
+
+            _context.Tareas.Add(nuevaTarea);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(ObtenerTareas), new { usuarioId = nuevaTarea.UsuarioId }, nuevaTarea);
+        }
+
+        // PUT: api/Tareas/5?usuarioId=anon-123
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> ActualizarTarea(int id, [FromQuery] string usuarioId, [FromBody] Tarea tareaActualizada)
+        {
+            // Buscamos la tarea asegurándonos de que pertenezca a ese usuario
+            var tarea = await _context.Tareas.FirstOrDefaultAsync(t => t.Id == id && t.UsuarioId == usuarioId);
+            if (tarea == null) return NotFound("Tarea no encontrada o no autorizada.");
+
             tarea.Titulo = tareaActualizada.Titulo;
             tarea.EstaCompletada = tareaActualizada.EstaCompletada;
-            tarea.Descripcion = tareaActualizada.Descripcion;
 
-            return NoContent(); // Código 204: Éxito pero no devolvemos nada (la tarea ya está actualizada)
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
 
-        // =========================================================================
-        // 4. ENDPOINT: ELIMINAR UNA TAREA (DELETE)
-        // =========================================================================
-        [HttpDelete("{id}")] // Al igual que el PUT, necesitamos el ID para saber cuál borrar
-        public ActionResult EliminarTarea(int id)
+        // DELETE: api/Tareas/5?usuarioId=anon-123
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> EliminarTarea(int id, [FromQuery] string usuarioId)
         {
-            var tarea = _tareas.FirstOrDefault(t => t.Id == id);
+            var tarea = await _context.Tareas.FirstOrDefaultAsync(t => t.Id == id && t.UsuarioId == usuarioId);
+            if (tarea == null) return NotFound("Tarea no encontrada o no autorizada.");
 
-            if (tarea == null) return NotFound(); // Si no existe, devolvemos 404
+            _context.Remove(tarea);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
 
-            _tareas.Remove(tarea); // Removemos de la lista
+        // =========================================================
+        // ACCIONES MASIVAS FILTRADAS POR USUARIO
+        // =========================================================
 
-            return NoContent(); // Código 204: Borrado exitoso
+        [HttpPut("completar-todos")]
+        public async Task<IActionResult> CompletarTodos([FromQuery] string usuarioId)
+        {
+            var tareas = await _context.Tareas.Where(t => t.UsuarioId == usuarioId).ToListAsync();
+            foreach (var t in tareas) t.EstaCompletada = true;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpPut("restaurar-todos")]
+        public async Task<IActionResult> RestaurarTodos([FromQuery] string usuarioId)
+        {
+            var tareas = await _context.Tareas.Where(t => t.UsuarioId == usuarioId).ToListAsync();
+            foreach (var t in tareas) t.EstaCompletada = false;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpDelete("eliminar-todos")]
+        public async Task<IActionResult> EliminarTodos([FromQuery] string usuarioId)
+        {
+            var tareas = await _context.Tareas.Where(t => t.UsuarioId == usuarioId).ToListAsync();
+            _context.Tareas.RemoveRange(tareas);
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
     }
 }
