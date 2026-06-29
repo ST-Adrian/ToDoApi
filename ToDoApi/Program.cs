@@ -3,8 +3,8 @@ using ToDoApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
 
 // =====================================================================
 // 1. CONFIGURACIÓN DE CORS (Servicios)
@@ -26,11 +26,6 @@ builder.Services.AddDbContext<TareasContext>(opciones =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
 // =====================================================================
 // 2. ACTIVAR CORS (Middleware)
 // ¡Importante! Debe ir ANTES de UseAuthorization y MapControllers
@@ -38,6 +33,9 @@ if (app.Environment.IsDevelopment())
 app.UseCors("PermitirTodo");
 
 app.UseHttpsRedirection();
+
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();

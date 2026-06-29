@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="todo-web/" Type="Website" DisplayName="todo-web">
+  <Project Path="D:/Code/AUSI/PAL1/Tp1/ToDoApi/todo-web/" Type="Website" DisplayName="todo-web">
     <BuildType Project="Debug" />
     <Properties Name="WebsiteProperties">
       <Property Name="Debug.AspNetCompiler.Debug" Value="&quot;True&quot;" />
@@ -20,5 +20,5 @@
       <Property Name="VWDPort" Value="&quot;62284&quot;" />
     </Properties>
   </Project>
-  <Project Path="ToDoApi/ToDoApi.csproj" />
+  <Project Path="D:/Code/AUSI/PAL1/Tp1/ToDoApi/ToDoApi/ToDoApi.csproj" />
 </Solution>
