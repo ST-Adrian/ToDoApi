@@ -19,7 +19,7 @@ export default function TodoApp() {
     // NUEVO: Estado para almacenar la identidad secreta del usuario
     const [usuarioId, setUsuarioId] = useState<string>('');
 
-    const API_URL = 'http://localhost:5020/api/Tareas';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
     // 1. GENERAR O LEER IDENTIDAD AL ABRIR LA PÁGINA
     useEffect(() => {
@@ -29,6 +29,7 @@ export default function TodoApp() {
             idGuardado = 'anon-' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
             localStorage.setItem('todo_usuario_id', idGuardado);
         }
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setUsuarioId(idGuardado);
     }, []);
 
