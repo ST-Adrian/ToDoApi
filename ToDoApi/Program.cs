@@ -8,8 +8,6 @@ builder.Services.AddControllers();
 
 // =====================================================================
 // 1. CONFIGURACIÓN DE CORS (Servicios)
-// Le decimos a la API que permita recibir peticiones desde cualquier origen, 
-// método (GET, POST, etc.) y encabezado.
 // =====================================================================
 builder.Services.AddCors(options =>
 {
@@ -27,8 +25,17 @@ builder.Services.AddDbContext<TareasContext>(opciones =>
 var app = builder.Build();
 
 // =====================================================================
-// 2. ACTIVAR CORS (Middleware)
-// ¡Importante! Debe ir ANTES de UseAuthorization y MapControllers
+// 2. CREACIÓN AUTOMÁTICA DE LA BASE DE DATOS
+// Esto asegura que las tablas se creen al arrancar el servidor
+// =====================================================================
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<TareasContext>();
+    db.Database.EnsureCreated();
+}
+
+// =====================================================================
+// 3. ACTIVAR CORS (Middleware)
 // =====================================================================
 app.UseCors("PermitirTodo");
 
